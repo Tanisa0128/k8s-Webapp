@@ -1,4 +1,4 @@
-# Kubernetes Webapp Deployment
+# K8s-webapp
 
  This project contains Kubernetes configuration files to deploy a web application and its MongoDB backend.
 
