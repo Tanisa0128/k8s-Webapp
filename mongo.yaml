@@ -1,0 +1,43 @@
+apiVersion: apps/v1               # API version for Deployment resource
+kind: Deployment                  # We are creating a Deployment
+metadata:
+  name: mongo-deployment                # Name of this Deployment
+spec:
+  replicas: 1                # Number of Pod copies we want running
+  selector:
+    matchLabels:
+      app: mongo        # Deployment will manage Pods with this label
+  template:                     # Pod template – defines what Pods will look like
+    metadata:
+      labels:
+        app: mongo             # Label to assign to each Pod created
+    spec:
+      containers:               # List of containers inside each Pod
+      - name: mongodb  # Name for the container inside Pod
+        image: mongo:5.0  # Container image from Docker Hub
+        ports:
+        - containerPort: 27017 # Port exposed by the container 
+        env:                  # Environment variables passed to container
+            - name: MONGO_INITDB_ROOT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-secret       # Refers to Kubernetes Secret named 'mongo-secret'
+                  key: mongo-user         # Key in the secret for username
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-secret       # Refers to Kubernetes Secret named 'mongo-secret'
+                  key: mongo-password     # Key in the secret for password
+       
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-service
+spec:
+  selector:
+    app: mongo
+  ports:
+    - protocol: TCP
+      port: 27017
+      targetPort: 27017
